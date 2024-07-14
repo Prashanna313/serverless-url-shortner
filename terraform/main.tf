@@ -41,7 +41,7 @@ resource "aws_lambda_function" "shorten_url" {
   function_name    = "shorten_url"
   role             = aws_iam_role.lambda_role.arn
   handler          = "shorten.lambda_handler"
-  runtime          = "python3.8"
+  runtime          = "python3.10"
   source_code_hash = filebase64sha256("shorten.zip")
   environment {
     variables = {
