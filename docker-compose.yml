@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  url-shortener:
+    build: .
+    volumes:
+      - ./src:/app
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    ports:
+      - "5000:5000"
