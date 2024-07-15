@@ -14,7 +14,7 @@ resource "aws_dynamodb_table" "url_shortener" {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "lambda_execution_role"
+  name               = "lambda_execution_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -51,12 +51,12 @@ resource "aws_lambda_function" "shorten_url" {
 }
 
 resource "aws_lambda_function" "redirect_url" {
-  filename         = "redirect.zip"
+  filename         = "shorten.zip"
   function_name    = "redirect_url"
   role             = aws_iam_role.lambda_role.arn
   handler          = "redirect.lambda_handler"
-  runtime          = "python3.8"
-  source_code_hash = filebase64sha256("redirect.zip")
+  runtime          = "python3.10"
+  source_code_hash = filebase64sha256("shorten.zip")
   environment {
     variables = {
       TABLE_NAME = aws_dynamodb_table.url_shortener.name
@@ -83,12 +83,12 @@ resource "aws_api_gateway_method" "shorten_method" {
 }
 
 resource "aws_api_gateway_integration" "shorten_integration" {
-  rest_api_id = aws_api_gateway_rest_api.url_shortener_api.id
-  resource_id = aws_api_gateway_resource.shorten_resource.id
-  http_method = aws_api_gateway_method.shorten_method.http_method
+  rest_api_id             = aws_api_gateway_rest_api.url_shortener_api.id
+  resource_id             = aws_api_gateway_resource.shorten_resource.id
+  http_method             = aws_api_gateway_method.shorten_method.http_method
   integration_http_method = "POST"
-  type        = "AWS_PROXY"
-  uri         = aws_lambda_function.shorten_url.invoke_arn
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.shorten_url.invoke_arn
 }
 
 resource "aws_api_gateway_resource" "redirect_resource" {
@@ -105,12 +105,12 @@ resource "aws_api_gateway_method" "redirect_method" {
 }
 
 resource "aws_api_gateway_integration" "redirect_integration" {
-  rest_api_id = aws_api_gateway_rest_api.url_shortener_api.id
-  resource_id = aws_api_gateway_resource.redirect_resource.id
-  http_method = aws_api_gateway_method.redirect_method.http_method
+  rest_api_id             = aws_api_gateway_rest_api.url_shortener_api.id
+  resource_id             = aws_api_gateway_resource.redirect_resource.id
+  http_method             = aws_api_gateway_method.redirect_method.http_method
   integration_http_method = "POST"
-  type        = "AWS_PROXY"
-  uri         = aws_lambda_function.redirect_url.invoke_arn
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.redirect_url.invoke_arn
 }
 
 output "api_url" {
